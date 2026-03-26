@@ -117,7 +117,7 @@ body{background:#09090B;color:#AAA;font-family:Calibri,'Segoe UI',sans-serif;min
 </div>
 <div class="footer">HAPTICWEAR · BARC0038 · THE BARTLETT UCL</div>
 </div>
-
+ 
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
@@ -177,7 +177,7 @@ window._zvals=[0,0,0,0];
 function updateSens(v){sensitivity=parseInt(v);document.getElementById('sensVal').textContent=v}
 function testVib(){if('vibrate'in navigator)navigator.vibrate([300,80,300,80,300])}
 function ic(){cv=document.getElementById('cv');cx=cv.getContext('2d');cv.width=cv.offsetWidth*2;cv.height=cv.offsetHeight*2}
-
+ 
 async function toggleBLE(){
   if(bleOn){if(bleDevice&&bleDevice.gatt.connected)bleDevice.gatt.disconnect();bleOn=false;document.getElementById('bleBtn').textContent='CONNECT';document.getElementById('bleBtn').classList.remove('on');return}
   try{bleDevice=await navigator.bluetooth.requestDevice({filters:[{name:'HapticWear'}],optionalServices:['19b10000-e8f2-537e-4f6c-d104768a1214']});
@@ -187,7 +187,7 @@ async function toggleBLE(){
     bleDevice.addEventListener('gattserverdisconnected',()=>{bleOn=false;document.getElementById('bleBtn').textContent='CONNECT';document.getElementById('bleBtn').classList.remove('on')});
   }catch(e){console.error(e)}}
 async function sendBLE(v){if(!bleOn||!bleChar)return;try{await bleChar.writeValueWithoutResponse(new Uint8Array(v.map(x=>Math.min(200,Math.max(0,Math.round(x))))).buffer)}catch(e){}}
-
+ 
 async function go(){
   const btn=document.getElementById('btn');
   if(run){stop();btn.textContent='START';btn.classList.remove('go');return}
@@ -200,21 +200,21 @@ async function go(){
     document.getElementById('st').textContent='CALIBRATING';document.getElementById('st').className='st cal';
     document.getElementById('calBar').classList.add('show');document.getElementById('nfDisp').textContent='Stay quiet...';
     ic();lp()}catch(e){console.error(e)}}
-
+ 
 function stop(){run=false;if(af)cancelAnimationFrame(af);if(ax)ax.close();navigator.vibrate(0);calibrated=false;
   document.getElementById('st').textContent='STANDBY';document.getElementById('st').className='st';
   document.getElementById('vs').textContent='OFF';document.getElementById('vs').className='vib-s off';
   document.getElementById('calBar').classList.remove('show');document.getElementById('nfDisp').textContent=''}
-
+ 
 function sm(m){mode=m;document.querySelectorAll('.md').forEach(b=>b.classList.remove('on'));
   document.getElementById(m==='cross'?'m1':m==='arb'?'m2':'m3').classList.add('on');if(m==='off')navigator.vibrate(0)}
-
+ 
 function fi(f){return Math.round(f*FS/SR)}
 function tdRMS(){const buf=new Float32Array(an.fftSize);an.getFloatTimeDomainData(buf);let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length)}
 function be(d,lo,hi){const a=fi(lo),b=Math.min(fi(hi),d.length-1);let s=0,n=0;for(let i=a;i<=b;i++){s+=Math.pow(10,d[i]/20);n++}return n>0?s/n:0}
-
+ 
 let sLo=0,sMi=0,sHi=0,sRms=0;const SMOOTH=0.25;let lastVibEnd=0;
-
+ 
 function doVib(r,lo,mi,hi){
   if(mode==='off'){navigator.vibrate(0);return{p:'OFF',z:[0,0,0,0]}}
   // BOOSTED sensitivity: sensM ranges 0.6 to 6.0
@@ -240,7 +240,7 @@ function doVib(r,lo,mi,hi){
       pd+=' · '+band;lastVibEnd=now+dur}else{if(now>lastVibEnd)navigator.vibrate(0)}}
   if(bleOn){sendBLE(z.map(v=>Math.min(200,Math.round(v*255))))}
   return{p:pd,z}}
-
+ 
 function ds(d){const w=cv.width,h=cv.height;cx.fillStyle='#0A0A0C';cx.fillRect(0,0,w,h);
   const n=Math.min(80,d.length),bw=w/n;
   for(let i=0;i<n;i++){const v=(d[i]+100)/100,bh=Math.max(0,v*h*.85),f=i*SR/FS;
@@ -249,7 +249,7 @@ function ds(d){const w=cv.width,h=cv.height;cx.fillStyle='#0A0A0C';cx.fillRect(0
     cx.fillStyle=f<300?'#5DCAA5':f<2000?'#EF9F27':'#AFA9EC';
     cx.fillRect(i*bw,h-bh,bw-1,2)}
   if(calibrated&&noiseFloor>0){const nfY=h-(noiseFloor/0.05)*h;cx.strokeStyle='#ffffff15';cx.lineWidth=1;cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(0,nfY);cx.lineTo(w,nfY);cx.stroke();cx.setLineDash([])}}
-
+ 
 let calStart=0;
 function lp(){if(!run)return;af=requestAnimationFrame(lp);
   an.getFloatFrequencyData(fft);const r=tdRMS();
@@ -280,3 +280,4 @@ let dp;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e
 </script>
 </body>
 </html>
+ 
